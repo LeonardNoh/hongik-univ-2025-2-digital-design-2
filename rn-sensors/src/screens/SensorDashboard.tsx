@@ -8,7 +8,7 @@ import ValueRow from '../components/ValueRow';
 import { timeLabel } from '../utils/format';
 import { useKeepAwake } from 'expo-keep-awake';
 
-const WS_URL = 'ws://192.168.0.23:8765'; // ← PC의 로컬 IP로 바꿔주세요
+const WS_URL = 'ws://192.168.188.94:8765'; // ← PC의 로컬 IP로 바꿔주세요
 
 export default function SensorDashboard() {
   useKeepAwake();
@@ -19,10 +19,10 @@ export default function SensorDashboard() {
     ts, hz, isActive,
     accel, gyro, mag,
     motion: {
-      rotation: motion?.rotation,            // {alpha,beta,gamma}
-      gravity: motion?.gravity,              // {x,y,z}
-      acceleration: motion?.acceleration,    // {x,y,z}
-      rotationRate: motion?.rotationRate,    // {alpha,beta,gamma} rad/s
+      rotation: motion?.rotation,                                  // {alpha,beta,gamma}
+      accelerationIncludingGravity: motion?.accelerationIncludingGravity,  // {x,y,z}
+      acceleration: motion?.acceleration,                          // {x,y,z}
+      rotationRate: motion?.rotationRate,                          // {alpha,beta,gamma} rad/s
     },
     derived: {
       headingRad,              // 이동 방향(요), 라디안
@@ -51,7 +51,7 @@ export default function SensorDashboard() {
         <View style={{ height: 8 }} />
         <Text style={styles.section}>DeviceMotion</Text>
         <ValueRow label="Rotation (αβγ)"       x={motion?.rotation?.alpha} y={motion?.rotation?.beta} z={motion?.rotation?.gamma} />
-        <ValueRow label="Gravity"              x={motion?.gravity?.x} y={motion?.gravity?.y} z={motion?.gravity?.z} />
+        <ValueRow label="Accel+Gravity"        x={motion?.accelerationIncludingGravity?.x} y={motion?.accelerationIncludingGravity?.y} z={motion?.accelerationIncludingGravity?.z} />
         <ValueRow label="Acceleration"         x={motion?.acceleration?.x} y={motion?.acceleration?.y} z={motion?.acceleration?.z} />
         <View style={{ height: 8 }} />
         <ValueRow label="Derived"              x={headingRad} y={speedMs} z={undefined} />

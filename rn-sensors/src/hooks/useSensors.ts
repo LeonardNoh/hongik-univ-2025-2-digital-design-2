@@ -1,6 +1,6 @@
 // src/hooks/useSensors.ts
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Accelerometer, Gyroscope, Magnetometer, DeviceMotion } from 'expo-sensors';
+import { Accelerometer, Gyroscope, Magnetometer, DeviceMotion, DeviceMotionMeasurement } from 'expo-sensors';
 
 export type SensorRates = 15 | 30 | 60; // Hz
 
@@ -11,7 +11,7 @@ const [hz, setHz] = useState<SensorRates>(initialHz);
 const [accel, setAccel] = useState<{ x?: number; y?: number; z?: number }>({});
 const [gyro, setGyro] = useState<{ x?: number; y?: number; z?: number }>({});
 const [mag, setMag] = useState<{ x?: number; y?: number; z?: number }>({});
-const [motion, setMotion] = useState<DeviceMotion.DeviceMotionMeasurement | null>(null);
+const [motion, setMotion] = useState<DeviceMotionMeasurement | null>(null);
 const [ts, setTs] = useState<number>(Date.now());
 
 // 간단한 로우패스 필터(노이즈 감소용)

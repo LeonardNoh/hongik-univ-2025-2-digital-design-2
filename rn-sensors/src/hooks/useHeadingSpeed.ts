@@ -1,9 +1,9 @@
 // src/hooks/useHeadingSpeed.ts
 import { useEffect, useState } from 'react';
 import * as Location from 'expo-location';
-import { DeviceMotion } from 'expo-sensors';
+import { DeviceMotionMeasurement } from 'expo-sensors';
 
-export function useHeadingSpeed(rotation?: DeviceMotion['rotation']) {
+export function useHeadingSpeed(rotation?: DeviceMotionMeasurement['rotation']) {
   const [speedMs, setSpeedMs] = useState<number>(0);
   const [headingRad, setHeadingRad] = useState<number>(0);
 
