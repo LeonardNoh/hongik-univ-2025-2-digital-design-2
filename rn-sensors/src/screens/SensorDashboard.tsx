@@ -1,5 +1,5 @@
 // src/screens/SensorDashboard.tsx
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useSensors } from '../hooks/useSensors';
 import { useHeadingSpeed } from '../hooks/useHeadingSpeed';
@@ -7,11 +7,15 @@ import { usePipe } from '../hooks/usePipe';
 import ValueRow from '../components/ValueRow';
 import { timeLabel } from '../utils/format';
 import { useKeepAwake } from 'expo-keep-awake';
+import ServerSetup from './ServerSetup';
 
-const WS_URL = 'ws://192.168.188.94:8765'; // ← PC의 로컬 IP로 바꿔주세요
+const DEFAULT_PORT = '8765';
 
 export default function SensorDashboard() {
   useKeepAwake();
+  const [serverIp, setServerIp] = useState<string | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
+
   const { isActive, toggle, hz, setHz, accel, gyro, mag, motion, ts } = useSensors(30);
   const { speedMs, headingRad } = useHeadingSpeed(motion?.rotation);
 
@@ -30,19 +34,40 @@ export default function SensorDashboard() {
     },
   }), [ts, hz, isActive, accel, gyro, mag, motion, speedMs, headingRad]);
 
+  const wsUrl = serverIp ? `ws://${serverIp}:${DEFAULT_PORT}` : null;
+
   usePipe({
-    enabled: isActive,
-    url: WS_URL,
+    enabled: isActive && !!wsUrl,
+    url: wsUrl || '',
     makePacket: () => packet,
     intervalMs: 100, // 10Hz 전송
   });
 
+  const handleConnect = (ip: string) => {
+    setServerIp(ip);
+    setShowSettings(false);
+  };
+
+  // 서버가 설정되지 않았으면 설정 화면 표시
+  if (!serverIp || showSettings) {
+    return <ServerSetup onConnect={handleConnect} currentIp={serverIp || undefined} />;
+  }
+
   return (
     <View style={styles.wrap}>
-      <Text style={styles.title}>Sensor Dashboard</Text>
-      <Text style={styles.sub}>
-        Last: {timeLabel(ts)} | {hz} Hz | {isActive ? 'LIVE' : 'PAUSED'}
-      </Text>
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.title}>Sensor Dashboard</Text>
+          <Text style={styles.sub}>
+            Last: {timeLabel(ts)} | {hz} Hz | {isActive ? 'LIVE' : 'PAUSED'}
+          </Text>
+        </View>
+        <Pressable onPress={() => setShowSettings(true)} style={styles.settingsBtn}>
+          <Text style={styles.settingsText}>⚙️</Text>
+        </Pressable>
+      </View>
+
+      <Text style={styles.serverInfo}>서버: {serverIp}:{DEFAULT_PORT}</Text>
 
       <View style={styles.card}>
         <ValueRow label="Accelerometer (g)"    x={accel.x} y={accel.y} z={accel.z} />
@@ -67,16 +92,18 @@ export default function SensorDashboard() {
           </Pressable>
         ))}
       </View>
-
-      <Text style={styles.tip}>Tip: 같은 Wi-Fi에 연결하고, PC의 로컬 IP로 WS_URL을 지정하세요.</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   wrap: { flex: 1, padding: 16, backgroundColor: '#0a1c47ff' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 },
   title: { fontSize: 22, fontWeight: '700', color: 'white', marginBottom: 4 },
   sub: { color: '#9fb0c5', marginBottom: 12 },
+  settingsBtn: { padding: 8, backgroundColor: '#1f2a44', borderRadius: 8 },
+  settingsText: { fontSize: 20 },
+  serverInfo: { color: '#ffd700', marginBottom: 12, fontSize: 13 },
   section: { color: '#cde1ff', fontWeight: '600', marginBottom: 6 },
   card: { backgroundColor: '#7792cdff', borderRadius: 14, padding: 12, borderWidth: 1, borderColor: '#1f2a44' },
   row: { flexDirection: 'row', gap: 10, marginTop: 12 },
@@ -86,5 +113,4 @@ const styles = StyleSheet.create({
   btnActive: { backgroundColor: '#1f2a44', borderColor: '#3b4a70' },
   btnGhost: { backgroundColor: 'transparent', borderColor: '#3b4a70' },
   btnText: { color: 'white', fontWeight: '600' },
-  tip: { color: '#7f93ad', marginTop: 16 }
 });
