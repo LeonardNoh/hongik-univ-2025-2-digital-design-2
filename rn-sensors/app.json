@@ -22,9 +22,12 @@
     },
     "ios": {
       "supportsTablet": false,
+      "bundleIdentifier": "com.hongik.rnsensors",
+      "buildNumber": "1.0.0",
       "infoPlist": {
         "NSMotionUsageDescription": "기기의 모션 데이터를 사용합니다.",
-        "NSLocationWhenInUseUsageDescription": "프로젝트 확장을 위해 위치 정보가 필요할 수 있습니다."
+        "NSLocationWhenInUseUsageDescription": "프로젝트 확장을 위해 위치 정보가 필요할 수 있습니다.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -37,6 +40,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "68021799-081d-49ee-9b6a-966cc11c5377"
+      }
     }
   }
 }
